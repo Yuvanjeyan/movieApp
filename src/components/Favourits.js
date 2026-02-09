@@ -12,7 +12,7 @@ function Favourits({ favourits = [], onRemoveFavourite }) {
     }
 
     return (
-        <div className="py-8 mt-4 mb-8 px-6 md:px-10">
+        <div className=" mt-4 mb-8 px-6 md:px-10">
             <h1 className="text-4xl font-bold mb-10 bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">⭐ My Favorites</h1>
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 px-0">
                 {favourits.map((movie) => (

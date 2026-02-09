@@ -70,7 +70,7 @@ function AppContent() {
     // Load default movies
     useEffect(() => {
         handleSearch("movies", 1);
-    }, []);
+    }, [handleSearch]);
 
     // Filter change
     const handleFilterChange = (value) => {
