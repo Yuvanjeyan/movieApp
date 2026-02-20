@@ -26,7 +26,7 @@ function AppContent() {
 
     // Fetch movies
     const handleSearch = useCallback(
-        async (term = searchTerm, page = 1) => {
+        async (term, page = 1, selectedFilter = "") => {
             try {
                 setLoading(true);
                 setError("");
@@ -37,9 +37,9 @@ function AppContent() {
                 const firstApiPage = Math.floor(startIndex / apiPageSize) + 1;
                 const lastApiPage = Math.floor((endIndex - 1) / apiPageSize) + 1;
 
-                const requests = [SearchMovie(term, filter, firstApiPage)];
+                const requests = [SearchMovie(term, selectedFilter, firstApiPage)];
                 if (lastApiPage > firstApiPage) {
-                    requests.push(SearchMovie(term, filter, lastApiPage));
+                    requests.push(SearchMovie(term, selectedFilter, lastApiPage));
                 }
 
                 const [firstData, secondData] = await Promise.all(requests);
@@ -48,8 +48,8 @@ function AppContent() {
                 let results = [...firstResults, ...secondResults];
                 
                 // Filter results on client side based on type filter
-                if (filter) {
-                    results = results.filter(movie => movie.Type.toLowerCase() === filter.toLowerCase());
+                if (selectedFilter) {
+                    results = results.filter(movie => movie.Type.toLowerCase() === selectedFilter.toLowerCase());
                 }
 
                 const offsetInCombined = startIndex - (firstApiPage - 1) * apiPageSize;
@@ -64,18 +64,18 @@ function AppContent() {
                 setLoading(false);
             }
         },
-        [filter, searchTerm]
+        []
     );
 
     // Load default movies
     useEffect(() => {
-        handleSearch("movies", 1);
+        handleSearch("movies", 1, "");
     }, [handleSearch]);
 
     // Filter change
     const handleFilterChange = (value) => {
         setFilter(value);
-        handleSearch(searchTerm, 1);
+        handleSearch(searchTerm || "movies", 1, value);
     };
 
     // Handle home click
@@ -84,7 +84,7 @@ function AppContent() {
         setSearchTerm("movies");
         setMovies([]);
         navigate("/");
-        handleSearch("movies", 1);
+        handleSearch("movies", 1, "");
     };
 
     const addToFavourits = (movie) => {
@@ -100,6 +100,15 @@ function AppContent() {
 
 
     const totalPages = Math.ceil(totalResults / moviesPerPage);
+    const maxVisiblePages = 3;
+    const pageStart = Math.min(
+        Math.max(currentPage - 1, 1),
+        Math.max(totalPages - (maxVisiblePages - 1), 1)
+    );
+    const pageNumbers = Array.from(
+        { length: Math.min(maxVisiblePages, totalPages) },
+        (_, i) => pageStart + i
+    );
 
     if (loading) {
         return <h1 className="text-4xl font-bold text-center mt-20">⏳ Loading movies...</h1>;
@@ -117,8 +126,8 @@ function AppContent() {
         <>
             {/* HEADER */}
             <header className="sticky top-0 z-50 w-full bg-black bg-opacity-95 backdrop-blur-md px-8 py-6 shadow-2xl border-b-4 border-red-600 flex flex-wrap gap-6 justify-between items-center">
-                <h1 className="text-5xl font-bold font-bebas bg-gradient-to-r from-red-600 to-yellow-500 bg-clip-text text-transparent tracking-wider whitespace-nowrap">NETFLIX</h1>
-                <SearchBar onSearch={(term) => handleSearch(term, 1)} />
+                <h1 className="text-5xl font-bold font-bebas text-red-600 tracking-wider whitespace-nowrap drop-shadow-[0_2px_10px_rgba(229,9,20,0.5)]">NETFLIX</h1>
+                <SearchBar onSearch={(term) => handleSearch(term, 1, filter)} />
 
                 <div className="flex items-center gap-6">
                     <button
@@ -158,17 +167,16 @@ function AppContent() {
                                         {/* Prev */}
                                         <button
                                             disabled={currentPage === 1}
-                                            onClick={() => handleSearch(searchTerm, currentPage - 1)}
+                                            onClick={() => handleSearch(searchTerm, currentPage - 1, filter)}
                                             className="px-3 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white font-bold transition disabled:opacity-40 disabled:cursor-not-allowed"
                                         >
                                             ←
                                         </button>
 
-                                        {/* Fixed small page list: 1,2,3 (cap to totalPages) */}
-                                        {Array.from({ length: Math.min(3, totalPages) }, (_, i) => i + 1).map((page) => (
+                                        {pageNumbers.map((page) => (
                                             <button
                                                 key={page}
-                                                onClick={() => handleSearch(searchTerm, page)}
+                                                onClick={() => handleSearch(searchTerm, page, filter)}
                                                 className={`px-4 py-2 rounded-md font-bold transition ${page === currentPage ? "bg-red-600 text-white" : "bg-gray-700 text-white hover:bg-gray-600"}`}
                                             >
                                                 {page}
@@ -178,7 +186,7 @@ function AppContent() {
                                         {/* Next */}
                                         <button
                                             disabled={currentPage === totalPages}
-                                            onClick={() => handleSearch(searchTerm, currentPage + 1)}
+                                            onClick={() => handleSearch(searchTerm, currentPage + 1, filter)}
                                             className="px-3 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white font-bold transition disabled:opacity-40 disabled:cursor-not-allowed"
                                         >
                                             →
