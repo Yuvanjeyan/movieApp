@@ -1,13 +1,15 @@
 # Movie App
 
-A React-based movie search app that uses the OMDb API to browse titles, view details, and manage a favourites list. It includes search, type filtering, and simple pagination.
+A React-based movie search app that uses the OMDb API to browse titles, view details, and manage a favourites list.
 
 ## Features
 - Search movies by keyword
-- Filter by type (movie, series, episode)
+- Filter by type (`movie`, `series`)
 - View movie details
 - Add/remove favourites
-- Pagination (12 results per view)
+- Pagination with 12 cards per UI page
+- Sliding pagination buttons (3 visible page numbers that move with current page)
+- Randomized home feed on refresh and Home click
 
 ## Tech Stack
 - React (Create React App)
@@ -19,7 +21,7 @@ A React-based movie search app that uses the OMDb API to browse titles, view det
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ (or a recent LTS)
+- Node.js 18+ (or recent LTS)
 - npm
 
 ### Install
@@ -39,22 +41,22 @@ npm run build
 ```
 
 ## Configuration
-The OMDb API key is currently hardcoded in `src/api.js`. You can replace it with your own key.
+The OMDb API key is currently hardcoded in `src/api.js`. Replace it with your own key if needed.
 
-Example update:
 ```js
 const API_KEY = "YOUR_KEY_HERE";
 ```
+
+## Notes
+- OMDb returns 10 items per API page; this app combines API pages to render 12 items per UI page.
+- Initial/home feed uses a random term from a predefined list and avoids repeating the immediate previous term.
+- Home title uses a solid fallback color to stay visible in production deployments.
 
 ## Project Structure
 - `public/` static assets
 - `src/` application source
 - `src/components/` UI components
 - `src/api.js` OMDb API client
-
-## Notes
-- Default search term is `movies` on initial load.
-- Pagination uses OMDb page size (10) and combines two API pages to render 12 items per view.
 
 ## Scripts
 - `npm start` run dev server

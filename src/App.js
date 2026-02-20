@@ -8,6 +8,17 @@ import FilterDropDown from "./components/FilterDropDown";
 import Favourits from "./components/Favourits";
 import { SearchMovie } from "./api";
 
+const HOME_SEARCH_TERMS = ["action", "comedy", "drama", "thriller", "adventure", "animation", "sci-fi", "romance", "crime", "fantasy"];
+
+const getRandomHomeTerm = () => {
+    const lastTerm = localStorage.getItem("lastHomeSearchTerm") || "";
+    const candidates = HOME_SEARCH_TERMS.filter((term) => term !== lastTerm);
+    const pool = candidates.length ? candidates : HOME_SEARCH_TERMS;
+    const nextTerm = pool[Math.floor(Math.random() * pool.length)];
+    localStorage.setItem("lastHomeSearchTerm", nextTerm);
+    return nextTerm;
+};
+
 function AppContent() {
     const navigate = useNavigate();
     const [movies, setMovies] = useState([]);
@@ -69,7 +80,8 @@ function AppContent() {
 
     // Load default movies
     useEffect(() => {
-        handleSearch("movies", 1, "");
+        const defaultTerm = getRandomHomeTerm();
+        handleSearch(defaultTerm, 1, "");
     }, [handleSearch]);
 
     // Filter change
@@ -80,11 +92,12 @@ function AppContent() {
 
     // Handle home click
     const handleHomeClick = () => {
+        const defaultTerm = getRandomHomeTerm();
         setFilter("");
-        setSearchTerm("movies");
+        setSearchTerm(defaultTerm);
         setMovies([]);
         navigate("/");
-        handleSearch("movies", 1, "");
+        handleSearch(defaultTerm, 1, "");
     };
 
     const addToFavourits = (movie) => {
@@ -126,7 +139,7 @@ function AppContent() {
         <>
             {/* HEADER */}
             <header className="sticky top-0 z-50 w-full bg-black bg-opacity-95 backdrop-blur-md px-8 py-6 shadow-2xl border-b-4 border-red-600 flex flex-wrap gap-6 justify-between items-center">
-                <h1 className="text-5xl font-bold font-bebas text-red-600 tracking-wider whitespace-nowrap drop-shadow-[0_2px_10px_rgba(229,9,20,0.5)]">NETFLIX</h1>
+                <h1 className="text-5xl font-bold font-bebas text-red-600 tracking-wider whitespace-nowrap drop-shadow-[0_2px_10px_rgba(229,9,20,0.5)]">MOVIE APP</h1>
                 <SearchBar onSearch={(term) => handleSearch(term, 1, filter)} />
 
                 <div className="flex items-center gap-6">
